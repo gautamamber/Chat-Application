@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Let's Chat</title>
+</head>
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+ <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+ <style>
+   .head{font-size: 80px;
+    color: #2a4c88;
+  }
+ </style>
+<body>
+<div class="container-fluid">
+  <div class="row"> 
+    <div class="col-xs-12">
+      <center class="head" ><b>Let's Chat</b></center>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-5">
+      <form>
+      <label for="name">Name</label><br>
+              <input type="text" class="username" name="fname" placeholder="Your Name" required><br>
+
+              <label for="lname">Message</label><br>
+              <input type="text" class="message" name="lname" placeholder="Type message.." required><br>
+              <input  type="submit" value="Send">
+        </form>
+        </center>
+      </form>
+    </div>
+    <div class="col-sm-7">
+       
+      <div class="no_message chat">
+          <h1 style='color: #ccc'>Chat empty..</h1>
+          <div class="holder"></div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+     <script>
+      var socket = io.connect( 'http://' + document.domain + ':' + location.port )
+      // broadcast a message
+      socket.on( 'connect', function() {
+        socket.emit( 'my event', {
+          data: 'User Connected'
+        } )
+        var form = $( 'form' ).on( 'submit', function( e ) {
+          e.preventDefault()
+          let user_name = $( 'input.username' ).val()
+          let user_input = $( 'input.message' ).val()
+          socket.emit( 'my event', {
+            user_name : user_name,
+            message : user_input
+          } )
+          // empty the input field
+          $( 'input.message' ).val( '' ).focus()
+        } )
+      } )
+
+      // capture message
+      socket.on( 'my response', function( msg ) {
+        console.log( msg )
+        if( typeof msg.user_name !== 'undefined' ) {
+          $( 'h1' ).remove()
+          $( 'div.holder' ).append( '<div class="msg_bbl"><b style="color: #000">'+msg.user_name+':</b> '+msg.message+'</div>' )
+        }
+      } )
+    </script>
+</body>
+</html>
